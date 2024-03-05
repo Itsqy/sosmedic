@@ -76,14 +76,29 @@ class MyRouterDelegate extends RouterDelegate
           ),
         ),
         if (isRegister == true)
-          const MaterialPage(
-              key: ValueKey("RegisterScreens"), child: RegisterScreen())
+          MaterialPage(
+              key: const ValueKey("RegisterScreens"),
+              child: RegisterScreen(
+                onLogin: () {
+                  isRegister = false;
+                  notifyListeners();
+                },
+                onRegisterSuccesful: () {
+                  isRegister = false;
+                  notifyListeners();
+                },
+              ))
       ];
 
   List<Page> get _loggedInStack => [
-        const MaterialPage(
-          key: ValueKey("HomeScreen"),
-          child: HomeScreen(),
+        MaterialPage(
+          key: const ValueKey("HomeScreen"),
+          child: HomeScreen(
+            onLogout: () {
+              isLoggedIn = false;
+              notifyListeners();
+            },
+          ),
         ),
         if (selectedStory != null)
           MaterialPage(

@@ -11,35 +11,47 @@ class AuthProvider extends ChangeNotifier {
 
   AuthProvider(this.authPreference, {required this.apiService});
 
-  ResultState? _state;
-  ResultState? get state => _state;
+  bool isLoadingLogin = false;
+  bool isLoadingLogout = false;
+  bool isLoadingRegister = false;
 
-  String _message = "";
-  String get message => _message;
+  ResultState? _stateLogin;
+  ResultState? get stateLogin => _stateLogin;
 
-  Future<dynamic> userLogin(UserRequest user) async {
-    _state = ResultState.loading;
-    notifyListeners();
+  String _messageLogin = "";
+  String get messageLogin => _messageLogin;
 
-    return apiService.login(user).then((loginResult) {
-      if (!loginResult.error) {
-        _state = ResultState.hasData;
-        authPreference.setUserToken(loginResult.loginResult.token ?? "");
-        _message = loginResult.message;
-      } else {
-        _state = ResultState.noData;
-        _message = loginResult.message;
-      }
-    }).catchError((error) {
-      if (error is SocketException) {
-        _state = ResultState.error;
-        _message = "Error: No Internet Connection";
-      } else {
-        _state = ResultState.error;
-        _message = "Error: $error";
-      }
-    }).whenComplete(() {
+  bool _statusCode = true;
+  bool get statusCode => _statusCode;
+
+  Future<dynamic> userLogin(UserRequest userRequest) async {
+    try {
+      _stateLogin = ResultState.loading;
       notifyListeners();
-    });
+
+      final loginResult = await apiService.login(userRequest);
+
+      if (loginResult.error != true) {
+        _stateLogin = ResultState.hasData;
+        authPreference.setUserToken(loginResult.loginResult?.token ?? "");
+
+        _messageLogin = loginResult.message ?? "Login Success";
+      } else {
+        _stateLogin = ResultState.noData;
+
+        _messageLogin = loginResult.message ?? "Login Failed";
+      }
+    } on SocketException {
+      _stateLogin = ResultState.error;
+
+      _messageLogin = "Error: No Internet Connection";
+    } catch (e) {
+      _stateLogin = ResultState.error;
+
+      _messageLogin = "Error: $e";
+      print(messageLogin);
+    } finally {
+      notifyListeners();
+    }
   }
 }

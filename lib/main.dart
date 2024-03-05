@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sosmedic/data/api_service.dart';
 import 'package:sosmedic/provider/auth_provider.dart';
 import 'package:sosmedic/screen/my_router_delegate.dart';
+import 'package:sosmedic/utils/auth_preference.dart';
 
 void main() {
   runApp(const SosmedicApp());
@@ -27,19 +29,24 @@ class _SosmedicAppState extends State<SosmedicApp> {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => authProvider,
-      child: MaterialApp(
-          title: 'Sosmedic',
-          theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-            useMaterial3: true,
-          ),
-          home: Router(
-            routerDelegate: myRouterDelegate,
-            backButtonDispatcher: RootBackButtonDispatcher(),
-          )),
-      // home: LoginScreen()),
-    );
+    return MultiProvider(
+        providers: [
+          ChangeNotifierProvider<AuthProvider>(
+            create: (context) =>
+                AuthProvider(AuthPreference(), apiService: ApiService()),
+          )
+        ],
+        builder: (context, child) {
+          return MaterialApp(
+              title: 'Sosmedic',
+              theme: ThemeData(
+                colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+                useMaterial3: true,
+              ),
+              home: Router(
+                routerDelegate: myRouterDelegate,
+                backButtonDispatcher: RootBackButtonDispatcher(),
+              ));
+        });
   }
 }

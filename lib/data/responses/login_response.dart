@@ -1,7 +1,3 @@
-// To parse this JSON data, do
-//
-//     final loginResponse = loginResponseFromJson(jsonString);
-
 import 'dart:convert';
 
 LoginResponse loginResponseFromJson(String str) =>
@@ -10,9 +6,9 @@ LoginResponse loginResponseFromJson(String str) =>
 String loginResponseToJson(LoginResponse data) => json.encode(data.toJson());
 
 class LoginResponse {
-  bool error;
-  String message;
-  LoginResult loginResult;
+  bool? error;
+  String? message;
+  LoginResult? loginResult; // Nullable LoginResult
 
   LoginResponse({
     required this.error,
@@ -23,13 +19,15 @@ class LoginResponse {
   factory LoginResponse.fromJson(Map<String, dynamic> json) => LoginResponse(
         error: json["error"],
         message: json["message"],
-        loginResult: LoginResult.fromJson(json["loginResult"]),
+        loginResult: json["loginResult"] != null
+            ? LoginResult.fromJson(json["loginResult"])
+            : null,
       );
 
   Map<String, dynamic> toJson() => {
         "error": error,
         "message": message,
-        "loginResult": loginResult.toJson(),
+        "loginResult": loginResult?.toJson(),
       };
 }
 

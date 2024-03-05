@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:logger/logger.dart';
 import 'package:sosmedic/data/responses/login_response.dart';
 import 'package:http/http.dart' as http;
 
@@ -7,14 +8,16 @@ class ApiService {
   static const String _url = "https://story-api.dicoding.dev/v1";
 
   Future<LoginResponse> login(UserRequest userRequest) async {
-    final request =
-        await http.post("$_url/login" as Uri, body: userRequest.toJson());
-    var response = LoginResponse.fromJson(json.decode(request.body));
-    switch (request.statusCode) {
-      case >= 200 && < 300:
-        return response;
-      default:
-        throw Exception("error : ${response.message}");
+    try {
+      final request =
+          await http.post(Uri.parse("$_url/login"), body: userRequest.toJson());
+      print(request.body);
+      var response = LoginResponse.fromJson(json.decode(request.body));
+      return response;
+    } on Exception catch (e) {
+      var logger = Logger();
+      logger.d(e.toString());
+      throw Exception(e);
     }
   }
 }
