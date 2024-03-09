@@ -13,6 +13,7 @@ class HomeScreen extends StatelessWidget {
           onPressed: () {
             var authProf = AuthPreference();
             authProf.setUserToken("");
+            print("userToken : {}");
             onLogout();
           },
           child: const Text("logout")),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:sosmedic/data/api_service.dart';
 import 'package:sosmedic/provider/auth_provider.dart';
@@ -7,8 +8,8 @@ import 'package:sosmedic/utils/result_state.dart';
 class LoginScreen extends StatefulWidget {
   const LoginScreen(
       {super.key, required this.onLogin, required this.onRegister});
-  final Function() onLogin;
-  final Function() onRegister;
+  final VoidCallback onLogin;
+  final VoidCallback onRegister;
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -21,14 +22,13 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void dispose() {
+    super.dispose();
     emailController.dispose();
     passwordController.dispose();
-    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    var watchAuth = context.watch<AuthProvider>();
     return Scaffold(
         body: Center(
       child: ConstrainedBox(
@@ -68,67 +68,47 @@ class _LoginScreenState extends State<LoginScreen> {
                 decoration: const InputDecoration(hintText: "input password"),
               ),
               const SizedBox(height: 20),
-              // Consumer<AuthProvider>(
-              //   builder: (context, provider, _) {
-              //     return ElevatedButton(
-              //       onPressed: () async {
-              //         if (formKey.currentState!.validate()) {
-              //           provider.userLogin(UserRequest(
-              //               email: emailController.text,
-              //               password: passwordController.text));
+              Consumer<AuthProvider>(
+                builder: (context, provider, _) {
+                  switch (provider.stateLogin) {
+                    case ResultState.hasData:
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        widget.onLogin.call();
+                        Provider.of<AuthProvider>(context, listen: false)
+                            .resetLoginState();
+                      });
 
-              //           provider.stateLogin == ResultState.hasData
-              //               ? widget.onLogin()
-              //               : null;
-              //         }
-              //         ;
-              //       },
-              //       child: Row(
-              //         children: [
-              //           if (provider.stateLogin == ResultState.loading) ...[
-              //             const Center(
-              //               child: CircularProgressIndicator(),
-              //             )
-              //           ],
-              //           const Text("Login")
-              //         ],
-              //       ),
-              //     );
-              //   },
-              // ),
-
-              watchAuth.isLoadingLogin
-                  ? const Center(
-                      child: CircularProgressIndicator(),
-                    )
-                  : ElevatedButton(
-                      onPressed: () {
-                        if (formKey.currentState!.validate()) {
-                          final UserRequest user = UserRequest(
-                            email: emailController.text,
-                            password: passwordController.text,
-                          );
-
-                          final authRead = context.read<AuthProvider>();
-                          final result = authRead.userLogin(user);
-                          print("authread : $result");
-                          debugPrint("stateLogin :${watchAuth.stateLogin} ");
-
-                          if (watchAuth.messageLogin == "success") {
-                            debugPrint("stateLogin :${watchAuth.stateLogin} ");
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text(authRead.messageLogin)));
-                            widget.onLogin();
-                          } else {
-                            debugPrint(
-                                "stateLoginElse :${authRead.stateLogin} ");
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text(authRead.messageLogin)));
-                          }
-                        }
-                      },
-                      child: const Text("Login")),
-
+                      break;
+                    case ResultState.noData:
+                    case ResultState.error:
+                      Fluttertoast.showToast(msg: provider.messageLogin);
+                      break;
+                    default:
+                      break;
+                  }
+                  print("${provider.stateLogin}");
+                  return ElevatedButton(
+                    onPressed: () async {
+                      if (formKey.currentState!.validate()) {
+                        provider.userLogin(UserRequest(
+                            email: emailController.text.trim(),
+                            password: passwordController.text.trim()));
+                      }
+                      ;
+                    },
+                    child: Column(
+                      children: [
+                        if (provider.stateLogin == ResultState.loading) ...[
+                          const Center(
+                            child: CircularProgressIndicator(),
+                          )
+                        ],
+                        const Center(child: Text("LOGIN"))
+                      ],
+                    ),
+                  );
+                },
+              ),
               const SizedBox(height: 8),
               OutlinedButton(
                 onPressed: () {

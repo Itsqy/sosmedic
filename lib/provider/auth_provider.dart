@@ -33,13 +33,12 @@ class AuthProvider extends ChangeNotifier {
 
       if (loginResult.error != true) {
         _stateLogin = ResultState.hasData;
-        authPreference.setUserToken(loginResult.loginResult?.token ?? "");
+        authPreference.setUserToken(loginResult.loginResult!.token);
 
-        _messageLogin = loginResult.message ?? "Login Success";
+        _messageLogin = loginResult.message!;
       } else {
         _stateLogin = ResultState.noData;
-
-        _messageLogin = loginResult.message ?? "Login Failed";
+        _messageLogin = loginResult.message!;
       }
     } on SocketException {
       _stateLogin = ResultState.error;
@@ -49,9 +48,17 @@ class AuthProvider extends ChangeNotifier {
       _stateLogin = ResultState.error;
 
       _messageLogin = "Error: $e";
-      print(messageLogin);
+      if (kDebugMode) {
+        print(messageLogin);
+      }
     } finally {
       notifyListeners();
     }
+  }
+
+  void resetLoginState() {
+    _stateLogin = null;
+    _messageLogin = "";
+    notifyListeners();
   }
 }

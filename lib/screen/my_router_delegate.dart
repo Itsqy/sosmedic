@@ -28,6 +28,7 @@ class MyRouterDelegate extends RouterDelegate
     } else {
       historyStack = _loggedOutStack;
     }
+    print("isloggedin : $isLoggedIn");
 
     return Navigator(
       key: navigatorKey,

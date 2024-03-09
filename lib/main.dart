@@ -6,6 +6,7 @@ import 'package:sosmedic/screen/my_router_delegate.dart';
 import 'package:sosmedic/utils/auth_preference.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const SosmedicApp());
 }
 
