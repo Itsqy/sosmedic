@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:sosmedic/data/api_service.dart';
+import 'package:sosmedic/data/request/login_request.dart';
+import 'package:sosmedic/data/request/register_request.dart';
 import 'package:sosmedic/utils/auth_preference.dart';
 import 'package:sosmedic/utils/result_state.dart';
 
@@ -11,54 +13,65 @@ class AuthProvider extends ChangeNotifier {
 
   AuthProvider(this.authPreference, {required this.apiService});
 
-  bool isLoadingLogin = false;
-  bool isLoadingLogout = false;
-  bool isLoadingRegister = false;
-
   ResultState? _stateLogin;
   ResultState? get stateLogin => _stateLogin;
 
   String _messageLogin = "";
   String get messageLogin => _messageLogin;
 
-  bool _statusCode = true;
-  bool get statusCode => _statusCode;
+  ResultState? _stateRegister;
+  ResultState? get stateRegister => _stateRegister;
 
-  Future<dynamic> userLogin(UserRequest userRequest) async {
-    try {
-      _stateLogin = ResultState.loading;
-      notifyListeners();
+  String _messageRegister = "";
+  String get messageRegister => _messageRegister;
 
-      final loginResult = await apiService.login(userRequest);
+  Future<dynamic> userLogin(LoginRequest userRequest) async {
+    _stateLogin = ResultState.loading;
+    notifyListeners();
 
-      if (loginResult.error != true) {
+    return await apiService.login(userRequest).then((result) {
+      if (result.error != true) {
         _stateLogin = ResultState.hasData;
-        authPreference.setUserToken(loginResult.loginResult!.token);
-
-        _messageLogin = loginResult.message!;
+        authPreference.setUserToken(result.loginResult!.token);
+        _messageLogin = result.message ?? " You just Created an Account";
       } else {
         _stateLogin = ResultState.noData;
-        _messageLogin = loginResult.message!;
+        _messageLogin = result.message ?? "Register failed please try again";
       }
-    } on SocketException {
-      _stateLogin = ResultState.error;
-
-      _messageLogin = "Error: No Internet Connection";
-    } catch (e) {
-      _stateLogin = ResultState.error;
-
-      _messageLogin = "Error: $e";
-      if (kDebugMode) {
-        print(messageLogin);
+    }).catchError((error) {
+      if (error is SocketException) {
+        _stateLogin = ResultState.error;
+        _messageLogin = "Error: No Internet Connection";
+      } else {
+        _stateLogin = ResultState.error;
+        _messageLogin = "Error: $error";
       }
-    } finally {
+    }).whenComplete(() {
       notifyListeners();
-    }
+    });
   }
 
-  void resetLoginState() {
-    _stateLogin = null;
-    _messageLogin = "";
+  Future<dynamic> userRegister(RegisterRequest userRequest) async {
+    _stateRegister = ResultState.loading;
     notifyListeners();
+    return await apiService.register(userRequest).then((result) {
+      if (result.error != true) {
+        _stateRegister = ResultState.hasData;
+        _messageRegister = result.message ?? " You just Created an Account";
+      } else {
+        _stateRegister = ResultState.noData;
+        _messageRegister = result.message ?? "Register failed please try again";
+      }
+    }).catchError((error) {
+      if (error is SocketException) {
+        _stateRegister = ResultState.error;
+        _messageRegister = "Error: No Internet Connection";
+      } else {
+        _stateRegister = ResultState.error;
+        _messageRegister = "Error: $error";
+      }
+    }).whenComplete(() {
+      notifyListeners();
+    });
   }
 }

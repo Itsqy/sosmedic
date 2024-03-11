@@ -14,6 +14,15 @@ class MyRouterDelegate extends RouterDelegate
     _init();
   }
 
+  _init() async {
+    var authPref = AuthPreference();
+    await authPref.getUserToken().then((token) {
+      isLoggedIn = token.isNotEmpty;
+      print("tokeninit : $token");
+      notifyListeners();
+    });
+  }
+
   String? selectedStory;
 
   List<Page> historyStack = [];
@@ -28,7 +37,7 @@ class MyRouterDelegate extends RouterDelegate
     } else {
       historyStack = _loggedOutStack;
     }
-    print("isloggedin : $isLoggedIn");
+    print("isloggedinRouter : $isLoggedIn");
 
     return Navigator(
       key: navigatorKey,
@@ -108,12 +117,4 @@ class MyRouterDelegate extends RouterDelegate
                 story: selectedStory!,
               ))
       ];
-
-  _init() async {
-    var authPref = AuthPreference();
-    authPref.getUserToken().then((token) {
-      isLoggedIn = token.isNotEmpty;
-      notifyListeners();
-    });
-  }
 }

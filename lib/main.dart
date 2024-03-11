@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sosmedic/data/api_service.dart';
 import 'package:sosmedic/provider/auth_provider.dart';
+import 'package:sosmedic/provider/story_provider.dart';
 import 'package:sosmedic/screen/my_router_delegate.dart';
-import 'package:sosmedic/utils/auth_preference.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,9 +32,8 @@ class _SosmedicAppState extends State<SosmedicApp> {
   Widget build(BuildContext context) {
     return MultiProvider(
         providers: [
-          ChangeNotifierProvider<AuthProvider>(
-            create: (context) =>
-                AuthProvider(AuthPreference(), apiService: ApiService()),
+          ChangeNotifierProvider<StoryProvider>(
+            create: (context) => StoryProvider(ApiService()),
           )
         ],
         builder: (context, child) {
