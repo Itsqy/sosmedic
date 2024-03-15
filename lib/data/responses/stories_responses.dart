@@ -28,20 +28,20 @@ class ListStoryResponse {
 }
 
 class ListStory {
-  String id;
-  String name;
-  String description;
-  String photoUrl;
-  DateTime createdAt;
+  String? id;
+  String? name;
+  String? description;
+  String? photoUrl;
+  DateTime? createdAt;
   double? lat;
   double? lon;
 
   ListStory({
-    required this.id,
-    required this.name,
-    required this.description,
-    required this.photoUrl,
-    required this.createdAt,
+    this.id,
+    this.name,
+    this.description,
+    this.photoUrl,
+    this.createdAt,
     this.lat,
     this.lon,
   });
@@ -61,7 +61,7 @@ class ListStory {
         "name": name,
         "description": description,
         "photoUrl": photoUrl,
-        "createdAt": createdAt.toIso8601String(),
+        "createdAt": createdAt?.toIso8601String(),
         "lat": lat,
         "lon": lon,
       };

@@ -23,7 +23,7 @@ class MyRouterDelegate extends RouterDelegate
     });
   }
 
-  String? selectedStory;
+  String? idStory;
 
   List<Page> historyStack = [];
   bool? isLoggedIn;
@@ -48,7 +48,7 @@ class MyRouterDelegate extends RouterDelegate
           return false;
         }
         isRegister = false;
-        selectedStory = null;
+        idStory = null;
         notifyListeners();
 
         return true;
@@ -108,13 +108,17 @@ class MyRouterDelegate extends RouterDelegate
               isLoggedIn = false;
               notifyListeners();
             },
+            onItemClicked: (String? itemId) {
+              idStory = itemId;
+              notifyListeners();
+            },
           ),
         ),
-        if (selectedStory != null)
+        if (idStory != null)
           MaterialPage(
-              key: ValueKey(selectedStory),
+              key: ValueKey(idStory),
               child: DetailScreen(
-                story: selectedStory!,
+                idstory: idStory!,
               ))
       ];
 }

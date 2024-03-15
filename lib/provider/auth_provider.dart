@@ -41,7 +41,7 @@ class AuthProvider extends ChangeNotifier {
     }).catchError((error) {
       if (error is SocketException) {
         _stateLogin = ResultState.error;
-        _messageLogin = "Error: No Internet Connection";
+        _messageLogin = "Error: check Your COnnection";
       } else {
         _stateLogin = ResultState.error;
         _messageLogin = "Error: $error";
@@ -65,7 +65,7 @@ class AuthProvider extends ChangeNotifier {
     }).catchError((error) {
       if (error is SocketException) {
         _stateRegister = ResultState.error;
-        _messageRegister = "Error: No Internet Connection";
+        _messageRegister = "Error: check Your COnnection";
       } else {
         _stateRegister = ResultState.error;
         _messageRegister = "Error: $error";

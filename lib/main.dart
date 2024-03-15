@@ -4,6 +4,7 @@ import 'package:sosmedic/data/api_service.dart';
 import 'package:sosmedic/provider/auth_provider.dart';
 import 'package:sosmedic/provider/story_provider.dart';
 import 'package:sosmedic/screen/my_router_delegate.dart';
+import 'package:sosmedic/utils/page_manager.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,7 +35,10 @@ class _SosmedicAppState extends State<SosmedicApp> {
         providers: [
           ChangeNotifierProvider<StoryProvider>(
             create: (context) => StoryProvider(ApiService()),
-          )
+          ),
+          // ChangeNotifierProvider<PageManager>(
+          //   create: (context) => PageManager(),
+          // ),
         ],
         builder: (context, child) {
           return MaterialApp(
